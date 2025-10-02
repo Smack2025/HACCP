@@ -1,0 +1,45 @@
+
+:root{
+  --bg:#fffef6;
+  --fg:#111;
+  --primary:#111;
+  --accent:#ffe600;
+  --muted:#f3f3f3;
+  --danger:#d61f1f;
+  --ok:#0a7d31;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--fg)}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--accent);border-bottom:2px solid #000;position:sticky;top:0;z-index:10}
+header h1{margin:0;font-size:20px}
+header .sub{font-size:12px;opacity:.8}
+nav{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:54px;z-index:9}
+nav button{border:1px solid #000;background:#fff;padding:8px 10px;border-radius:999px;cursor:pointer}
+nav button.active{background:#000;color:#fff}
+.container{max-width:980px;margin:0 auto;padding:16px}
+.card{background:#fff;border:1px solid #000;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:4px 4px 0 #000}
+.card h2{margin:0 0 8px 0;font-size:18px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+label{font-size:13px;margin-top:8px;display:block}
+input[type=text],input[type=number],input[type=datetime-local],select,textarea{
+  width:100%;padding:8px;border:1px solid #000;border-radius:10px;background:#fff;
+}
+textarea{min-height:80px}
+.table{width:100%;border-collapse:separate;border-spacing:0;margin-top:8px}
+.table th,.table td{border-bottom:1px dashed #ccc;padding:8px;text-align:left;font-size:13px}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid #000;font-size:12px}
+.badge.ok{background:#eaffea;border-color:#0a7d31}
+.badge.fail{background:#ffecec;border-color:#d61f1f}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+button.primary{background:#000;color:#fff;border:1px solid #000;padding:10px 12px;border-radius:10px;cursor:pointer}
+button.secondary{background:#fff;border:1px solid #000;padding:10px 12px;border-radius:10px;cursor:pointer}
+footer{padding:40px 16px;text-align:center;color:#666}
+.kv{display:grid;grid-template-columns:180px 1fr;gap:8px;font-size:13px}
+hr{border:none;border-top:1px dashed #ccc;margin:12px 0}
+.warning{color:var(--danger);font-weight:600}
+.small{font-size:12px;opacity:.8}
+@media (max-width: 720px){
+  .grid,.grid3{grid-template-columns:1fr}
+  nav{position:static}
+}

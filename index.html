@@ -1,0 +1,303 @@
+
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SafeBite HACCP Log</title>
+  <meta name="description" content="Offline-first HACCP logboek voor kleine food vendors. Sla lokaal op, exporteer CSV/print PDF.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#000000">
+</head>
+<body>
+<header>
+  <div>
+    <h1>SafeBite HACCP</h1>
+    <div class="sub" id="businessSub">Offline logboek • <span id="todayLabel"></span></div>
+  </div>
+  <div class="actions">
+    <button class="secondary" id="installBtn" style="display:none">Installeren</button>
+  </div>
+</header>
+
+<nav id="nav">
+  <button data-tab="dashboard" class="active">Dashboard</button>
+  <button data-tab="opening">Openingscheck</button>
+  <button data-tab="closing">Sluitingscheck</button>
+  <button data-tab="temps">Temperaturen</button>
+  <button data-tab="cleaning">Schoonmaak</button>
+  <button data-tab="allergens">Allergenen</button>
+  <button data-tab="corrective">Correctieve acties</button>
+  <button data-tab="settings">Instellingen</button>
+  <button data-tab="export">Export/Print</button>
+</nav>
+
+<div class="container">
+  <section id="tab-dashboard" class="card">
+    <h2>Overzicht vandaag</h2>
+    <div class="grid3">
+      <div class="card">
+        <strong>Openingscheck</strong>
+        <div id="dash-open"></div>
+      </div>
+      <div class="card">
+        <strong>Temperaturen</strong>
+        <div id="dash-temps"></div>
+      </div>
+      <div class="card">
+        <strong>Schoonmaak</strong>
+        <div id="dash-clean"></div>
+      </div>
+    </div>
+    <hr/>
+    <div class="small">Let op: drempelwaardes kun je aanpassen bij Instellingen. Dit is geen juridisch advies; check lokale HACCP/Voedselautoriteitseisen.</div>
+  </section>
+
+  <section id="tab-opening" class="card" style="display:none">
+    <h2>Openingscheck</h2>
+    <div class="grid">
+      <div>
+        <label>Medewerker</label>
+        <input type="text" id="open-staff" placeholder="Naam"/>
+        <label>Datum/tijd</label>
+        <input type="datetime-local" id="open-dt"/>
+        <label>Algemene notitie</label>
+        <textarea id="open-notes" placeholder="Notities..."></textarea>
+        <div class="actions">
+          <button class="primary" id="open-save">Opslaan</button>
+          <button class="secondary" id="open-clear">Velden wissen</button>
+        </div>
+      </div>
+      <div>
+        <label><input type="checkbox" id="open-hands"> Handen gewassen / wasbak voorzien</label>
+        <label><input type="checkbox" id="open-surfaces"> Werkbladen schoon & gedesinfecteerd</label>
+        <label><input type="checkbox" id="open-stock"> Grondstoffen correct gelabeld & op temperatuur</label>
+        <label><input type="checkbox" id="open-probe"> Kernthermometer gekalibreerd</label>
+      </div>
+    </div>
+    <table class="table" id="open-table"></table>
+  </section>
+
+  <section id="tab-closing" class="card" style="display:none">
+    <h2>Sluitingscheck</h2>
+    <div class="grid">
+      <div>
+        <label>Medewerker</label>
+        <input type="text" id="close-staff" placeholder="Naam"/>
+        <label>Datum/tijd</label>
+        <input type="datetime-local" id="close-dt"/>
+        <label>Algemene notitie</label>
+        <textarea id="close-notes" placeholder="Notities..."></textarea>
+        <div class="actions">
+          <button class="primary" id="close-save">Opslaan</button>
+          <button class="secondary" id="close-clear">Velden wissen</button>
+        </div>
+      </div>
+      <div>
+        <label><input type="checkbox" id="close-chill"> Alle producten correct gekoeld/bewaard</label>
+        <label><input type="checkbox" id="close-clean"> Apparatuur & vloeren schoongemaakt</label>
+        <label><input type="checkbox" id="close-trash"> Afval verwijderd en container afgesloten</label>
+        <label><input type="checkbox" id="close-pest"> Geen sporen van ongedierte</label>
+      </div>
+    </div>
+    <table class="table" id="close-table"></table>
+  </section>
+
+  <section id="tab-temps" class="card" style="display:none">
+    <h2>Temperaturen</h2>
+    <div class="grid">
+      <div>
+        <label>Medewerker</label>
+        <input type="text" id="temp-staff" placeholder="Naam"/>
+        <label>Datum/tijd</label>
+        <input type="datetime-local" id="temp-dt"/>
+        <label>Locatie</label>
+        <select id="temp-location">
+          <option>Koelkast</option>
+          <option>Vriezer</option>
+          <option>Warme bewaring</option>
+          <option>Bakolie</option>
+        </select>
+        <label>Temperatuur (°C)</label>
+        <input type="number" id="temp-value" step="0.1" placeholder="°C"/>
+        <label>Notitie</label>
+        <textarea id="temp-notes" placeholder="Notities..."></textarea>
+        <div class="actions">
+          <button class="primary" id="temp-save">Opslaan</button>
+          <button class="secondary" id="temp-clear">Velden wissen</button>
+        </div>
+      </div>
+      <div class="kv">
+        <div>Koelkast ≤</div><div><span id="th-fridge"></span> °C</div>
+        <div>Vriezer ≤</div><div><span id="th-freezer"></span> °C</div>
+        <div>Warme bewaring ≥</div><div><span id="th-hot"></span> °C</div>
+        <div>Bakolie (advies)</div><div><span id="th-oil-low"></span>–<span id="th-oil-high"></span> °C</div>
+      </div>
+    </div>
+    <table class="table" id="temp-table"></table>
+  </section>
+
+  <section id="tab-cleaning" class="card" style="display:none">
+    <h2>Schoonmaak</h2>
+    <div class="grid">
+      <div>
+        <label>Medewerker</label>
+        <input type="text" id="clean-staff" placeholder="Naam"/>
+        <label>Datum/tijd</label>
+        <input type="datetime-local" id="clean-dt"/>
+        <label>Zone</label>
+        <select id="clean-area">
+          <option>Werkblad</option>
+          <option>Frituur/oven</option>
+          <option>Koelkast/vriezer</option>
+          <option>Vloer</option>
+          <option>Overig</option>
+        </select>
+        <label>Methode/middel</label>
+        <input type="text" id="clean-method" placeholder="Bijv. reiniger X, 5 min inwerktijd"/>
+        <label>Notitie</label>
+        <textarea id="clean-notes" placeholder="Notities..."></textarea>
+        <div class="actions">
+          <button class="primary" id="clean-save">Opslaan</button>
+          <button class="secondary" id="clean-clear">Velden wissen</button>
+        </div>
+      </div>
+    </div>
+    <table class="table" id="clean-table"></table>
+  </section>
+
+  <section id="tab-allergens" class="card" style="display:none">
+    <h2>Allergenen</h2>
+    <div>
+      <label>Medewerker</label>
+      <input type="text" id="allerg-staff" placeholder="Naam"/>
+      <label>Datum/tijd</label>
+      <input type="datetime-local" id="allerg-dt"/>
+      <label>Product / batch</label>
+      <input type="text" id="allerg-product" placeholder="Bijv. Empanada kip, batch #..."/>
+      <label>Actie</label>
+      <select id="allerg-action">
+        <option>Label gecheckt & juist</option>
+        <option>Kruisbesmetting voorkomen</option>
+        <option>Informatie verstrekt aan klant</option>
+        <option>Incident vastgelegd</option>
+      </select>
+      <label>Notitie</label>
+      <textarea id="allerg-notes" placeholder="Notities..."></textarea>
+      <div class="actions">
+        <button class="primary" id="allerg-save">Opslaan</button>
+        <button class="secondary" id="allerg-clear">Velden wissen</button>
+      </div>
+    </div>
+    <table class="table" id="allerg-table"></table>
+  </section>
+
+  <section id="tab-corrective" class="card" style="display:none">
+    <h2>Correctieve acties</h2>
+    <div>
+      <label>Medewerker</label>
+      <input type="text" id="corr-staff" placeholder="Naam"/>
+      <label>Datum/tijd</label>
+      <input type="datetime-local" id="corr-dt"/>
+      <label>Situatie</label>
+      <input type="text" id="corr-situation" placeholder="Wat ging mis?"/>
+      <label>Actie</label>
+      <textarea id="corr-action" placeholder="Welke maatregel is genomen?"></textarea>
+      <label>Resultaat</label>
+      <textarea id="corr-result" placeholder="Wat is het resultaat/controle?"></textarea>
+      <div class="actions">
+        <button class="primary" id="corr-save">Opslaan</button>
+        <button class="secondary" id="corr-clear">Velden wissen</button>
+      </div>
+    </div>
+    <table class="table" id="corr-table"></table>
+  </section>
+
+  <section id="tab-settings" class="card" style="display:none">
+    <h2>Instellingen</h2>
+    <div class="grid">
+      <div>
+        <label>Bedrijfsnaam</label>
+        <input type="text" id="set-name" placeholder="Colombia Vida"/>
+        <label>Adres</label>
+        <input type="text" id="set-address" placeholder="Straat 1, Plaats"/>
+        <label>Standaard medewerker</label>
+        <input type="text" id="set-staff" placeholder="Naam"/>
+      </div>
+      <div>
+        <label>Drempelwaarden (°C)</label>
+        <div class="grid">
+          <div>
+            <label>Koelkast max</label>
+            <input type="number" id="set-fridge" step="0.1"/>
+          </div>
+          <div>
+            <label>Vriezer max</label>
+            <input type="number" id="set-freezer" step="0.1"/>
+          </div>
+          <div>
+            <label>Warme bewaring min</label>
+            <input type="number" id="set-hot" step="0.1"/>
+          </div>
+          <div>
+            <label>Bakolie min</label>
+            <input type="number" id="set-oil-low" step="0.1"/>
+          </div>
+          <div>
+            <label>Bakolie max</label>
+            <input type="number" id="set-oil-high" step="0.1"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="primary" id="set-save">Instellingen opslaan</button>
+      <button class="secondary" id="set-reset">Alle data wissen</button>
+    </div>
+  </section>
+
+  <section id="tab-export" class="card" style="display:none">
+    <h2>Export & print</h2>
+    <div class="actions">
+      <button class="secondary" id="exp-open">Download Openingscheck CSV</button>
+      <button class="secondary" id="exp-close">Download Sluitingscheck CSV</button>
+      <button class="secondary" id="exp-temps">Download Temperaturen CSV</button>
+      <button class="secondary" id="exp-clean">Download Schoonmaak CSV</button>
+      <button class="secondary" id="exp-allerg">Download Allergenen CSV</button>
+      <button class="secondary" id="exp-corr">Download Correctieve acties CSV</button>
+      <button class="secondary" id="exp-email">Mail dagrapport</button>
+      <button class="primary" id="exp-print">Print dagrapport (PDF)</button>
+    </div>
+    <p class="small">Tip: gebruik "Opslaan als PDF" in de afdrukdialoog voor een nette PDF.</p>
+  </section>
+</div>
+
+<footer>© 2025 SafeBite (MVP). Geen juridisch advies.</footer>
+
+<script defer src="app.js"></script>
+<script type="module" src="auth.js"></script>
+<script>
+  // PWA install prompt
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+  installBtn?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+
+  // Service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+</body>
+</html>
